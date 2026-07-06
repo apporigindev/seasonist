@@ -1,0 +1,11 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="256" cy="256" r="256" fill="#ECE7E1"/>
+  
+  <path transform="translate(256 246) scale(0.78)" fill="#1B1814" d="
+    M6 -150
+    C 88 -158 154 -96 158 -18
+    C 162 62 108 130 30 146
+    C -50 162 -128 118 -150 42
+    C -170 -28 -128 -104 -58 -134
+    C -38 -143 -16 -148 6 -150 Z"/>
+</svg>

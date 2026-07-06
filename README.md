@@ -22,6 +22,12 @@ python3 -m http.server 8000
 
 Then open `http://localhost:8000`. **HTTPS (or localhost) is required** for camera access — for phone testing, use `npx serve` + a tunnel (e.g. `ngrok`) or deploy to any static host (Netlify / Vercel / GitHub Pages).
 
+## Deploy
+
+Live at **https://apporigindev.github.io/hue/** — every push to `main` redeploys automatically via GitHub Actions (`.github/workflows/pages.yml`). No build step: the workflow stamps the commit SHA into `sw.js` (so returning visitors' service worker picks up every deploy) and uploads the repo root to GitHub Pages as-is.
+
+One-time setup on a fresh repo: **Settings → Pages → Build and deployment → Source: "GitHub Actions"** — the workflow's default token cannot enable Pages by itself, so the first run fails until this is set.
+
 > The MediaPipe model (~3 MB) loads from CDN on first run, then is cached by the browser. Everything else is static.
 
 ## Architecture
@@ -56,6 +62,6 @@ The thresholds in `js/classify.js` are **sensible starting points, not validated
 
 - [ ] Classifier tuning against real test set (see above)
 - [ ] White-balance normalization
-- [ ] PWA manifest + offline caching of the MediaPipe model
+- [x] PWA manifest + offline caching of the MediaPipe model (`manifest.webmanifest`, `sw.js`, `icons/`)
 - [ ] Shareable result card (rendered image download)
 - [ ] Realistic garment recoloring on the photo (v2 — generative)

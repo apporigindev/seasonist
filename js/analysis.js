@@ -7,30 +7,39 @@
  * perceptual metrics used by classify.js.
  */
 
-import {
-  FaceLandmarker,
-  FilesetResolver,
-} from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14";
+const MEDIAPIPE_CDN = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14";
 
-let landmarker = null;
+let landmarkerPromise = null;
 
-/** Lazily initialize the MediaPipe FaceLandmarker (WASM, on-device). */
-export async function initLandmarker() {
-  if (landmarker) return landmarker;
-  const vision = await FilesetResolver.forVisionTasks(
-    "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm"
-  );
-  landmarker = await FaceLandmarker.createFromOptions(vision, {
-    baseOptions: {
-      modelAssetPath:
-        "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",
-      delegate: "GPU",
-    },
-    runningMode: "IMAGE",
-    numFaces: 1,
-    outputFaceBlendshapes: false,
-  });
-  return landmarker;
+/**
+ * Lazily initialize the MediaPipe FaceLandmarker (WASM, on-device).
+ * The CDN bundle is imported dynamically so that loading it offline fails
+ * as a catchable error inside runAnalysis (the "check your connection"
+ * screen) instead of killing the whole module graph before any UI binds.
+ * The in-flight promise is shared so the warm-up call and the first
+ * analysis never initialize twice; a failure clears it so retry works.
+ */
+export function initLandmarker() {
+  if (!landmarkerPromise) {
+    landmarkerPromise = (async () => {
+      const { FaceLandmarker, FilesetResolver } = await import(MEDIAPIPE_CDN);
+      const vision = await FilesetResolver.forVisionTasks(MEDIAPIPE_CDN + "/wasm");
+      return FaceLandmarker.createFromOptions(vision, {
+        baseOptions: {
+          modelAssetPath:
+            "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",
+          delegate: "GPU",
+        },
+        runningMode: "IMAGE",
+        numFaces: 1,
+        outputFaceBlendshapes: false,
+      });
+    })().catch((err) => {
+      landmarkerPromise = null;
+      throw err;
+    });
+  }
+  return landmarkerPromise;
 }
 
 /* ----- MediaPipe FaceMesh landmark indices for sample regions ----- */

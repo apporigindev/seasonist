@@ -207,3 +207,13 @@ $("btn-start-over").addEventListener("click", () => {
   state.season = null;
   show("screen-consent");
 });
+
+/* ---------------- PWA ---------------- */
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js").catch(() => {
+      // Offline support is progressive enhancement — the app works without it.
+    });
+  });
+}
