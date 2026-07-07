@@ -22,13 +22,12 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
-      - name: Stamp service worker cache version with the commit SHA
-        run: sed -i "s/__BUILD__/${GITHUB_SHA}/" www/sw.js
+      # Publishes the public landing + legal pages in site/ (NOT the app in
+      # www/, which is bundled into the native app and not a web product).
       # Requires one-time setup: Settings → Pages → Source: "GitHub Actions".
-      # (The default GITHUB_TOKEN cannot create the Pages site itself.)
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: www
+          path: site
       - id: deployment
         uses: actions/deploy-pages@v4

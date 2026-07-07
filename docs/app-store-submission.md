@@ -175,19 +175,19 @@ Result: **4+** — no objectionable content.
 
 ## 9. URLs (App Information & Version)
 
-Base site: `https://apporigindev.github.io/seasonist/`
+Base site (landing + legal, published from `site/`): `https://apporigindev.github.io/seasonist/`
 
 | Field | URL | Required? |
 |---|---|---|
-| **Privacy Policy URL** | `https://apporigindev.github.io/seasonist/privacy` | **Required** |
-| **Support URL** | `https://apporigindev.github.io/seasonist/support` | **Required** |
+| **Privacy Policy URL** | `https://apporigindev.github.io/seasonist/privacy.html` | **Required** |
+| **Support URL** | `https://apporigindev.github.io/seasonist/` | **Required** |
 | **Marketing URL** | `https://apporigindev.github.io/seasonist/` | Optional |
 
 Notes:
 
-- **Privacy Policy URL is mandatory** for all apps. Point it at `/privacy`. If you don't have a dedicated `/privacy` page yet, point it at the **in-app legal page** URL instead — just make sure the URL Apple can open publicly renders the same policy (state clearly: on-device processing, no data collection, no accounts).
-- **Support URL is mandatory** and must resolve to a real page. If `/support` doesn't exist yet, **add a simple support page** (a single static page with a contact email — e.g. `development@app-origin.com` — and a one-line "How Seasonist works / Privacy" note is enough). Temporarily you may point Support at the home page `https://apporigindev.github.io/seasonist/`, but a dedicated `/support` page is recommended.
-- **Marketing URL** can safely be the site root.
+- **Privacy Policy URL** → `privacy.html` (a bilingual EN/BG page rendering the same policy shown in-app). `terms.html` holds the Terms of Use.
+- **Support URL** → the landing page satisfies Apple's requirement: it explains how the app works and shows a contact email (`development@app-origin.com`). No separate support page needed.
+- **Marketing URL** → the site root (the landing).
 
 **Action item for the owner:** create a `/support` page (and confirm `/privacy` resolves) before submitting, so both required URLs return HTTP 200.
 
@@ -246,14 +246,14 @@ Also set:
 - [ ] **Subtitle:** `Find your seasonal palette`
 - [ ] **Category:** Primary = **Lifestyle**, Secondary = **Photo & Video**.
 - [ ] **Age Rating:** complete questionnaire → all "None/No" → **4+**.
-- [ ] **Privacy Policy URL:** `https://apporigindev.github.io/seasonist/privacy` (confirm it loads).
+- [ ] **Privacy Policy URL:** `https://apporigindev.github.io/seasonist/privacy.html` (confirm it loads).
 
 **App Privacy**
 - [ ] **App Privacy → Get Started** → "Do you collect data?" → **No** → publish → shows **"Data Not Collected."**
 
 **Prepare the version (e.g. 1.0)**
 - [ ] **Promotional Text**, **Description** (English), **Keywords** — paste from sections 2, 3, 5 above.
-- [ ] **Support URL:** `https://apporigindev.github.io/seasonist/support` (create the page first).
+- [ ] **Support URL:** `https://apporigindev.github.io/seasonist/` (landing page — serves as support).
 - [ ] **Marketing URL:** `https://apporigindev.github.io/seasonist/` (optional).
 - [ ] **Screenshots:** upload required sizes — 6.7"/6.9" iPhone (mandatory) and 6.5" iPhone; iPad only if you support iPad.
 - [ ] **App Icon:** 1024×1024 PNG, no transparency, no rounded corners (delivered in the build's asset catalog).

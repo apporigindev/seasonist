@@ -25,8 +25,8 @@ recreated.
    language English, bundle ID `com.apporigin.seasonist`, SKU e.g.
    `seasonist-001`.
 2. Privacy policy URL (required before external TestFlight/review):
-   `https://apporigindev.github.io/seasonist/PRIVACY.md` works, or a page on
-   app-origin.com.
+   `https://apporigindev.github.io/seasonist/privacy.html` (the landing site's
+   bilingual privacy page).
 3. The **ASC API key is reused** from BidPazar (Users and Access → Keys) —
    no new key needed.
 

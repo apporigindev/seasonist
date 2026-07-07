@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seasonist — Personal Color Analysis</title>
+  <meta name="description" content="Find the colors you were born to wear. Seasonist reads your undertone, depth, and contrast from one selfie and matches you to your 12-season color palette — instantly, and entirely on your device.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <!-- Open Graph / social sharing -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Seasonist — Wear your season">
+  <meta property="og:description" content="Your personal color season from a single selfie. Instant, private, on-device.">
+  <meta property="og:image" content="https://apporigindev.github.io/seasonist/og-image.png">
+  <meta property="og:url" content="https://apporigindev.github.io/seasonist/">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#ECE7E1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --stone:#ECE7E1; --stone-deep:#E2DCD3; --ink:#1B1814; --ink-soft:#4A443C;
+      --white:#FBF9F6; --mauve:#B98D86; --line:rgba(27,24,20,0.12);
+      --display:'Cormorant Garamond',Georgia,serif; --body:'Manrope',system-ui,sans-serif;
+      --ease:cubic-bezier(0.22,1,0.36,1);
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{background:var(--stone);color:var(--ink);font-family:var(--body);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+    .veil-text{
+      background:linear-gradient(90deg,#D97F55 0%,#D3A052 38%,#8FA47C 66%,#7A93B5 100%);
+      -webkit-background-clip:text;background-clip:text;color:transparent;
+    }
+    /* ambient blobs */
+    .blobwrap{position:fixed;inset:0;overflow:hidden;z-index:0;pointer-events:none;}
+    .blob{position:absolute;width:60vh;height:60vh;max-width:520px;max-height:520px;
+      border-radius:42% 58% 65% 35%/45% 40% 60% 55%;filter:blur(8px);opacity:0.42;}
+    .blob.b1{background:conic-gradient(from 120deg,#E29B7B,#E5C185 30%,#B9C6AC 60%,#9DAEC4 85%,#E29B7B);top:-20vh;left:-16vh;}
+    .blob.b2{background:radial-gradient(circle at 30% 30%,var(--white) 0%,#E5C185 45%,transparent 75%);bottom:-24vh;right:-18vh;opacity:0.5;}
+    .wrap{position:relative;z-index:1;max-width:920px;margin:0 auto;padding:0 24px;}
+
+    /* top bar */
+    .topbar{display:flex;align-items:center;justify-content:space-between;padding:22px 0;}
+    .brandrow{display:flex;align-items:center;gap:10px;}
+    .brandrow svg{width:30px;height:30px;}
+    .brandrow .name{font-family:var(--display);font-style:italic;font-weight:600;font-size:20px;}
+    .lang-toggle{display:inline-flex;gap:2px;padding:3px;border-radius:999px;background:rgba(251,249,246,0.7);border:1px solid var(--line);}
+    .lang-toggle button{font-family:var(--body);font-size:11px;letter-spacing:0.04em;border:none;background:transparent;color:var(--ink-soft);padding:5px 11px;border-radius:999px;cursor:pointer;transition:background .2s,color .2s;}
+    .lang-toggle button.active{background:var(--ink);color:var(--white);}
+
+    /* hero */
+    .hero{text-align:center;padding:56px 0 40px;}
+    .hero .mark{width:96px;height:96px;margin:0 auto 10px;}
+    .hero .slogan{font-family:var(--display);font-weight:500;font-size:14px;letter-spacing:0.34em;text-transform:uppercase;text-indent:0.34em;margin-bottom:18px;}
+    .hero h1{font-family:var(--display);font-weight:500;font-size:clamp(38px,7vw,68px);line-height:1.08;letter-spacing:0.005em;margin-bottom:20px;text-wrap:balance;}
+    .hero h1 em{font-style:italic;color:var(--mauve);}
+    .hero p.sub{max-width:52ch;margin:0 auto 30px;color:var(--ink-soft);font-size:16px;line-height:1.7;}
+    .cta{display:inline-flex;flex-direction:column;align-items:center;gap:8px;}
+    .badge{display:inline-flex;align-items:center;gap:10px;background:var(--ink);color:var(--white);padding:13px 22px;border-radius:14px;font-weight:600;font-size:14px;text-decoration:none;transition:transform .2s var(--ease),opacity .2s;}
+    .badge:hover{transform:translateY(-1px);opacity:.92;}
+    .badge svg{width:20px;height:20px;}
+    .cta small{color:var(--ink-soft);font-size:12px;letter-spacing:0.02em;}
+
+    /* features */
+    .features{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin:56px 0;}
+    .feature{background:rgba(251,249,246,0.55);border:1px solid var(--line);border-radius:18px;padding:26px 22px;}
+    .feature h3{font-family:var(--display);font-style:italic;font-weight:600;font-size:20px;margin-bottom:8px;}
+    .feature p{color:var(--ink-soft);font-size:13.5px;line-height:1.6;}
+
+    /* steps */
+    .steps{text-align:center;margin:56px 0;}
+    .steps .eyebrow{font-family:var(--body);font-weight:600;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--mauve);margin-bottom:26px;}
+    .steprow{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+    .step .n{font-family:var(--display);font-style:italic;font-size:34px;color:var(--mauve);line-height:1;margin-bottom:8px;}
+    .step p{color:var(--ink-soft);font-size:14px;}
+
+    /* footer */
+    footer{border-top:1px solid var(--line);margin-top:40px;padding:30px 0 48px;text-align:center;}
+    .footlinks{display:flex;flex-wrap:wrap;gap:8px 16px;justify-content:center;margin-bottom:14px;}
+    .footlinks a{color:var(--ink-soft);font-size:13px;text-decoration:underline;text-underline-offset:3px;}
+    .footlinks a:hover{color:var(--ink);}
+    footer .fine{color:var(--ink-soft);font-size:12px;line-height:1.7;}
+
+    @media(max-width:640px){
+      .features,.steprow{grid-template-columns:1fr;}
+    }
+    @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto;}}
+  </style>
+</head>
+<body>
+  <div class="blobwrap" aria-hidden="true"><div class="blob b1"></div><div class="blob b2"></div></div>
+
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brandrow">
+        <svg viewBox="0 0 100 100" fill="none" aria-hidden="true">
+          <defs><linearGradient id="v" x1="0.2" y1="0" x2="0.8" y2="1"><stop offset="0" stop-color="#E29B7B"/><stop offset="0.38" stop-color="#E5C185"/><stop offset="0.66" stop-color="#B9C6AC"/><stop offset="1" stop-color="#9DAEC4"/></linearGradient></defs>
+          <path d="M 66 19 C 46 6, 25 20, 33 35 C 40 46, 60 48, 67 59 C 74 74, 52 90, 33 79" stroke="url(#v)" stroke-width="13" stroke-linecap="round"/>
+        </svg>
+        <span class="name">Seasonist</span>
+      </div>
+      <div class="lang-toggle" role="group" aria-label="Change language">
+        <button type="button" data-lang="bg">БГ</button>
+        <button type="button" data-lang="en">EN</button>
+      </div>
+    </div>
+
+    <section class="hero">
+      <svg class="mark" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+        <path d="M 66 19 C 46 6, 25 20, 33 35 C 40 46, 60 48, 67 59 C 74 74, 52 90, 33 79" stroke="url(#v)" stroke-width="12" stroke-linecap="round"/>
+      </svg>
+      <div class="slogan veil-text" data-en="Wear your season" data-bg="Носи своя сезон">Wear your season</div>
+      <h1 data-en-html="Find the colors you were <em>born to wear</em>" data-bg-html="Открий цветовете, <em>създадени за теб</em>">Find the colors you were <em>born to wear</em></h1>
+      <p class="sub" data-en="Seasonist reads your undertone, depth, and contrast from a single daylight selfie — and matches you to your 12-season color palette. Instantly, and entirely on your device." data-bg="Seasonist разчита подтона, дълбочината и контраста ти от една селфи снимка на дневна светлина и те свързва с твоята 12-сезонна цветова палитра. Мигновено и изцяло на твоето устройство.">Seasonist reads your undertone, depth, and contrast from a single daylight selfie — and matches you to your 12-season color palette. Instantly, and entirely on your device.</p>
+      <div class="cta">
+        <a class="badge" href="#" aria-disabled="true">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.05 12.53c-.02-2.02 1.65-2.99 1.73-3.04-.94-1.38-2.4-1.57-2.92-1.59-1.24-.13-2.43.73-3.06.73-.63 0-1.6-.71-2.64-.69-1.36.02-2.61.79-3.31 2-1.41 2.45-.36 6.07 1.01 8.06.67.97 1.47 2.06 2.51 2.02 1.01-.04 1.39-.65 2.61-.65 1.22 0 1.56.65 2.63.63 1.09-.02 1.78-.99 2.44-1.97.77-1.13 1.09-2.22 1.11-2.28-.02-.01-2.13-.82-2.15-3.25zM15.04 6.9c.56-.68.94-1.62.83-2.56-.81.03-1.79.54-2.37 1.21-.52.6-.98 1.56-.86 2.48.9.07 1.83-.46 2.4-1.13z"/></svg>
+          <span data-en="Coming soon to the App Store" data-bg="Очаквай скоро в App Store">Coming soon to the App Store</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="features">
+      <div class="feature">
+        <h3 data-en="Your season, in seconds" data-bg="Твоят сезон за секунди">Your season, in seconds</h3>
+        <p data-en="A daylight selfie is all it takes. No forms, no account, no waiting." data-bg="Една селфи снимка на дневна светлина е всичко нужно. Без формуляри, без регистрация, без чакане.">A daylight selfie is all it takes. No forms, no account, no waiting.</p>
+      </div>
+      <div class="feature">
+        <h3 data-en="Private by design" data-bg="Поверителност по дизайн">Private by design</h3>
+        <p data-en="Your photo is analyzed on your device and never uploaded, stored, or shared." data-bg="Снимката ти се анализира на твоето устройство и никога не се качва, съхранява или споделя.">Your photo is analyzed on your device and never uploaded, stored, or shared.</p>
+      </div>
+      <div class="feature">
+        <h3 data-en="A palette you can wear" data-bg="Палитра, която можеш да носиш">A palette you can wear</h3>
+        <p data-en="Get the exact shades that flatter you — for clothes, makeup, and everything you choose." data-bg="Получи точните нюанси, които те подчертават — за дрехи, грим и всичко, което избираш.">Get the exact shades that flatter you — for clothes, makeup, and everything you choose.</p>
+      </div>
+    </section>
+
+    <section class="steps">
+      <div class="eyebrow" data-en="How it works" data-bg="Как работи">How it works</div>
+      <div class="steprow">
+        <div class="step"><div class="n">1</div><p data-en="Take a daylight selfie, or upload one" data-bg="Направи селфи на дневна светлина или качи снимка">Take a daylight selfie, or upload one</p></div>
+        <div class="step"><div class="n">2</div><p data-en="See your season and your palette" data-bg="Виж своя сезон и своята палитра">See your season and your palette</p></div>
+        <div class="step"><div class="n">3</div><p data-en="Wear the colors made for you" data-bg="Носи цветовете, създадени за теб">Wear the colors made for you</p></div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="footlinks">
+        <a href="privacy.html" data-en="Privacy Policy" data-bg="Политика за поверителност">Privacy Policy</a>
+        <a href="terms.html" data-en="Terms of Use" data-bg="Условия за ползване">Terms of Use</a>
+        <a href="mailto:development@app-origin.com">development@app-origin.com</a>
+      </div>
+      <p class="fine" data-en="© 2026 App-Origin. Seasonist is a personal styling tool — its results are guidance, not professional or medical advice." data-bg="© 2026 App-Origin. Seasonist е инструмент за личен стил — резултатите са ориентир, а не професионална или медицинска консултация.">© 2026 App-Origin. Seasonist is a personal styling tool — its results are guidance, not professional or medical advice.</p>
+    </footer>
+  </div>
+
+  <script>
+    (function(){
+      var KEY='seasonist:lang';
+      function stored(){try{var v=localStorage.getItem(KEY);return v==='en'||v==='bg'?v:null;}catch(e){return null;}}
+      function device(){var l=(navigator.languages&&navigator.languages[0])||navigator.language||'en';return l.toLowerCase().indexOf('bg')===0?'bg':'en';}
+      var lang=stored()||device();
+      function apply(){
+        document.documentElement.lang=lang;
+        document.querySelectorAll('[data-en]').forEach(function(el){el.textContent=el.getAttribute('data-'+lang);});
+        document.querySelectorAll('[data-en-html]').forEach(function(el){el.innerHTML=el.getAttribute('data-'+lang+'-html');});
+        document.querySelectorAll('.lang-toggle button').forEach(function(b){
+          var on=b.getAttribute('data-lang')===lang;b.classList.toggle('active',on);b.setAttribute('aria-pressed',on?'true':'false');
+        });
+      }
+      document.querySelectorAll('.lang-toggle button').forEach(function(b){
+        b.addEventListener('click',function(){lang=b.getAttribute('data-lang');try{localStorage.setItem(KEY,lang);}catch(e){}apply();});
+      });
+      apply();
+    })();
+  </script>
+</body>
+</html>

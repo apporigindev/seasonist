@@ -24,7 +24,13 @@ Then open `http://localhost:8000`. **HTTPS (or localhost) is required** for came
 
 ## Deploy
 
-Live at **https://apporigindev.github.io/seasonist/** — every push to `main` redeploys automatically via GitHub Actions (`.github/workflows/pages.yml`). No build step: the workflow stamps the commit SHA into `www/sw.js` (so returning visitors' service worker picks up every deploy) and publishes the `www/` folder to GitHub Pages.
+**No public web app** — Seasonist ships as a native mobile app only. GitHub
+Pages hosts just a **landing + legal site** (`site/`) at
+**https://apporigindev.github.io/seasonist/** (also the App Store privacy/
+support URL target). Every push to `main` redeploys it via GitHub Actions
+(`.github/workflows/pages.yml`, no build step). The app itself lives in `www/`
+and is bundled into the native binary — it is **not** deployed as a web
+product (a free working web version would undercut the paid app).
 
 One-time setup on a fresh repo: **Settings → Pages → Build and deployment → Source: "GitHub Actions"** — the workflow's default token cannot enable Pages by itself, so the first run fails until this is set.
 
@@ -45,7 +51,11 @@ www/                 the web app (deployed to GitHub Pages as-is)
   js/strings.js      EN UI strings (+ strings.bg.js = BG, generated)
   js/seasons.bg.js   Bulgarian season text (generated)
   js/legalContent.js Privacy Policy + Terms, EN + BG (generated)
-  PRIVACY.md         privacy policy (URL target, mirrors legalContent EN)
+site/                public landing + legal site (deployed to GitHub Pages)
+  index.html         bilingual marketing landing (App Store CTA)
+  privacy.html       privacy policy page (EN + BG)
+  terms.html         terms of use page (EN + BG)
+  og-image.png       social-share image
 ios/                 Capacitor 8 iOS wrapper (SPM, no CocoaPods)
 assets/brand/        Season Drape master SVG
 docs/                TestFlight setup + App Store submission guides
@@ -64,7 +74,7 @@ EN strings in `strings.js` are authoritative; BG lives in the generated
 
 - **In-app**: Privacy Policy, Terms of Use, and About are reachable from the
   consent screen footer, rendered from `js/legalContent.js` (EN + BG).
-- **Privacy URL**: `https://apporigindev.github.io/seasonist/PRIVACY.md`.
+- **Public site** (`site/`): landing page + `privacy.html` + `terms.html` (both bilingual). Privacy URL for the App Store: `https://apporigindev.github.io/seasonist/privacy.html`.
 - **Submission**: copy-paste listing text, App Privacy answers, and the
   "create the app" checklist are in
   [docs/app-store-submission.md](docs/app-store-submission.md).
