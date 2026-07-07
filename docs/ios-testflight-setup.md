@@ -25,12 +25,12 @@ recreated.
    language English, bundle ID `com.apporigin.seasonist`, SKU e.g.
    `seasonist-001`.
 2. Privacy policy URL (required before external TestFlight/review):
-   `https://apporigindev.github.io/hue/PRIVACY.md` works, or a page on
+   `https://apporigindev.github.io/seasonist/PRIVACY.md` works, or a page on
    app-origin.com.
 3. The **ASC API key is reused** from BidPazar (Users and Access → Keys) —
    no new key needed.
 
-## 3. GitHub secrets (github.com/apporigindev/hue → Settings → Secrets → Actions)
+## 3. GitHub secrets (github.com/apporigindev/seasonist → Settings → Secrets → Actions)
 
 Same six names as the BidPazar repo — copy the values across, except the
 provisioning profile which is the new Seasonist one:

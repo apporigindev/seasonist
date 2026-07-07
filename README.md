@@ -1,6 +1,6 @@
 # Seasonist — wear your season
 
-Personal color analysis from a single daylight photo. Fully client-side: the photo never leaves the user's device. (Repo and live URL still carry the working name "hue".)
+Personal color analysis from a single daylight photo. Fully client-side: the photo never leaves the user's device.
 
 ## User journey
 
@@ -12,19 +12,19 @@ Personal color analysis from a single daylight photo. Fully client-side: the pho
 
 ## Run locally
 
-No build step. Any static server works:
+No build step. The web app lives in `www/` — serve that folder:
 
 ```bash
-npx serve .
+npx serve www
 # or
-python3 -m http.server 8000
+cd www && python3 -m http.server 8000
 ```
 
 Then open `http://localhost:8000`. **HTTPS (or localhost) is required** for camera access — for phone testing, use `npx serve` + a tunnel (e.g. `ngrok`) or deploy to any static host (Netlify / Vercel / GitHub Pages).
 
 ## Deploy
 
-Live at **https://apporigindev.github.io/hue/** — every push to `main` redeploys automatically via GitHub Actions (`.github/workflows/pages.yml`). No build step: the workflow stamps the commit SHA into `sw.js` (so returning visitors' service worker picks up every deploy) and uploads the repo root to GitHub Pages as-is.
+Live at **https://apporigindev.github.io/seasonist/** — every push to `main` redeploys automatically via GitHub Actions (`.github/workflows/pages.yml`). No build step: the workflow stamps the commit SHA into `www/sw.js` (so returning visitors' service worker picks up every deploy) and publishes the `www/` folder to GitHub Pages.
 
 One-time setup on a fresh repo: **Settings → Pages → Build and deployment → Source: "GitHub Actions"** — the workflow's default token cannot enable Pages by itself, so the first run fails until this is set.
 
