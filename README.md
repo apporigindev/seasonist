@@ -62,15 +62,25 @@ assets/brand/        Season Drape master SVG
 docs/                TestFlight setup + App Store submission guides
 ```
 
-## Monetization (in progress)
+## Monetization
 
-Planned model (from market research): free teaser (season + a few colors) →
-one-time / subscription **premium unlock**. `backend/` holds a Fastify service
-that validates App Store / Play purchases and tracks anonymous entitlements
-(see `backend/README.md`). Built and unit-tested, but **not yet wired into the
-app or deployed** — that needs the App Store Connect app + IAP products + a
-host + domain. The app stays on-device and privacy-first; only an anonymous
-subscription record is kept server-side once wired in.
+**Pay per detailed analysis** — a one-time **consumable** in-app purchase
+(no subscription; color analysis is one-and-done). Free result teases the
+season + a few hero colors; €4.99 unlocks the full palette, the drape
+comparison, and the trait breakdown, and **saves the analysis on-device**
+(see the "Your analyses" library). A new photo is a fresh unlock.
+
+- **On-device, no backend.** The unlock is verified on-device via StoreKit 2 /
+  Play Billing through `cordova-plugin-purchase` (`js/purchase.js`). Digital
+  unlocks must go through Apple/Google — external processors (Stripe, Revolut,
+  direct card) aren't allowed; the user pays with their own card / Apple Pay /
+  Google Pay via the system sheet. In the browser a simulated sheet stands in.
+- **Go-live:** create the app + a **consumable** IAP product
+  `seasonist.analysis.unlock` in App Store Connect, then `npx cap sync ios`
+  (wires the purchase plugin into the native project). No server required.
+- `backend/` holds a subscription service (validation + entitlements +
+  webhooks) — **not used by this consumable model**; kept for if recurring
+  plans are ever added. See `backend/README.md`.
 
 ## Languages
 

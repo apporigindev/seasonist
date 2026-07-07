@@ -12,6 +12,8 @@ import { localizeSeason } from "./palettes.js";
 import { renderCompare } from "./compare.js";
 import { LEGAL } from "./legalContent.js";
 import { t, getLang, initI18n, applyStatic, onLangChange } from "./i18n.js";
+import { initPurchases, getUnlockPrice, buyUnlock } from "./purchase.js";
+import { listAnalyses, saveAnalysis, getAnalysis, newId } from "./savedAnalyses.js";
 
 const $ = (id) => document.getElementById(id);
 
@@ -25,7 +27,10 @@ const state = {
   errorKind: null,   // 'noFace' | 'lowLight' | 'generic' — for re-translation
   infoDoc: null,     // 'privacy' | 'terms' | 'about' — for re-translation
   infoReturn: "screen-consent",
+  unlocked: false,   // has the current analysis been paid for?
 };
+
+let unlockPrice = "€4.99"; // localized store price, resolved on init
 
 /* ---------------- screen navigation ---------------- */
 
@@ -126,6 +131,7 @@ async function runAnalysis(img) {
     state.faceBox = samples.faceBox;
     state.seasonKey = key;
     state.metrics = metrics;
+    state.unlocked = false; // every new analysis starts locked
     clearInterval(ticker);
     renderResult();
     show("screen-result");
@@ -152,6 +158,13 @@ function renderResult() {
   $("season-name").textContent = s.name;
   $("season-desc").textContent = s.desc;
 
+  // Free teaser: the first three hero colours (no labels).
+  $("hero-swatches").innerHTML = s.swatches
+    .slice(0, 3)
+    .map((sw) => `<div class="chip" style="background:${sw.hex}"></div>`)
+    .join("");
+
+  // Premium palette (revealed only after unlock).
   $("swatch-row").innerHTML = s.swatches
     .map((sw) => `<div class="swatch" style="background:${sw.hex}"></div>`)
     .join("");
@@ -166,11 +179,106 @@ function renderResult() {
     <div class="trait"><b>${t("result.trait.clarity")}</b><span>${t(`metric.chroma.${m.chroma}`)}</span></div>
   `;
 
+  $("unlock-price").textContent = unlockPrice;
+
   // Retint the ambient blobs with the user's own palette.
   const [c1, c2, c3, c4] = s.swatches.map((sw) => sw.hex);
   document.querySelector(".blob.b1").style.background =
     `conic-gradient(from 120deg, ${c1}, ${c2} 30%, ${c3} 60%, ${c4} 85%, ${c1})`;
+
+  applyUnlockState();
 }
+
+/** Toggle free-teaser vs unlocked-premium visibility on the result screen. */
+function applyUnlockState() {
+  const on = state.unlocked;
+  $("result-premium").hidden = !on;
+  $("unlock-panel").hidden = on;
+  $("hero-swatches").hidden = on; // teaser hides once the full palette shows
+  $("btn-to-compare").hidden = !(on && state.photo);
+  $("btn-library").hidden = listAnalyses().length === 0;
+}
+
+/* ---------------- unlock (pay per analysis) ---------------- */
+
+async function doUnlock() {
+  const btn = $("btn-unlock");
+  btn.disabled = true;
+  try {
+    const res = await buyUnlock();
+    if (res && res.ok) {
+      state.unlocked = true;
+      saveAnalysis({
+        id: newId(),
+        seasonKey: state.seasonKey,
+        metrics: state.metrics,
+        label: t("library.you"),
+        unlockedAt: new Date().toISOString(),
+      });
+      applyUnlockState();
+      showToast(t("unlock.done"));
+    } else if (res && res.cancelled) {
+      showToast(t("unlock.cancelled"));
+    }
+  } catch {
+    showToast(t("unlock.failed"));
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+$("btn-unlock").addEventListener("click", doUnlock);
+
+/* ---------------- saved analyses library ---------------- */
+
+function renderLibrary() {
+  const list = listAnalyses();
+  const el = $("saved-list");
+  el.replaceChildren();
+  if (!list.length) {
+    el.innerHTML = `<p class="saved-empty">${esc(t("library.empty"))}</p>`;
+    return;
+  }
+  for (const a of list) {
+    const s = localizeSeason(a.seasonKey, getLang());
+    if (!s) continue;
+    const sw = s.swatches
+      .slice(0, 4)
+      .map((x) => `<span style="background:${x.hex}"></span>`)
+      .join("");
+    const dt = new Date(a.unlockedAt);
+    const dstr = isNaN(dt.getTime()) ? "" : dt.toLocaleDateString();
+    const card = document.createElement("button");
+    card.type = "button";
+    card.className = "saved-card";
+    card.innerHTML =
+      `<span class="sw">${sw}</span>` +
+      `<span class="info"><span class="nm">${esc(s.name)}</span>` +
+      `<span class="dt">${esc(a.label || "")}${dstr ? " · " + esc(dstr) : ""}</span></span>` +
+      `<span class="chev" aria-hidden="true">›</span>`;
+    card.addEventListener("click", () => openSaved(a.id));
+    el.append(card);
+  }
+}
+
+function openSaved(id) {
+  const a = getAnalysis(id);
+  if (!a) return;
+  state.seasonKey = a.seasonKey;
+  state.metrics = a.metrics;
+  state.photo = null; // no photo kept → drape comparison unavailable for saved
+  state.faceBox = null;
+  state.unlocked = true;
+  renderResult();
+  show("screen-result");
+}
+
+$("btn-library").addEventListener("click", () => {
+  renderLibrary();
+  show("screen-library");
+});
+$("btn-library-back").addEventListener("click", () => show("screen-consent"));
+$("btn-library-new").addEventListener("click", resetToCapture);
 
 /* ---------------- compare ---------------- */
 
@@ -193,6 +301,7 @@ function enterCompare() {
 }
 
 $("btn-to-compare").addEventListener("click", () => {
+  if (!state.unlocked || !state.photo) return; // premium + needs the live photo
   state.compareIdx = 0;
   enterCompare();
   show("screen-compare");
@@ -259,6 +368,7 @@ $("btn-info-back").addEventListener("click", () => show(state.infoReturn));
 function resetToCapture() {
   state.photo = null;
   state.faceBox = null;
+  state.unlocked = false;
   show("screen-capture");
   startCamera();
 }
@@ -269,6 +379,7 @@ $("btn-start-over").addEventListener("click", () => {
   state.photo = null;
   state.faceBox = null;
   state.seasonKey = null;
+  state.unlocked = false;
   show("screen-consent");
 });
 
@@ -281,6 +392,7 @@ function deleteAnalysis() {
   state.faceBox = null;
   state.seasonKey = null;
   state.metrics = null;
+  state.unlocked = false;
 
   const canvas = $("compare-canvas");
   if (canvas) {
@@ -342,12 +454,24 @@ onLangChange(() => {
   if (state.errorKind) applyError();
   if (state.seasonKey && screen === "screen-result") renderResult();
   if (state.seasonKey && screen === "screen-compare") enterCompare();
+  if (screen === "screen-library") renderLibrary();
   if (screen === "screen-info" && state.infoDoc) {
     state.infoDoc === "about" ? openAbout() : openDoc(state.infoDoc);
   }
 });
 
 initI18n();
+
+// Resolve the localized store price for the unlock button (native only;
+// falls back to a default in the browser).
+initPurchases()
+  .then(getUnlockPrice)
+  .then((p) => {
+    unlockPrice = p;
+    const el = $("unlock-price");
+    if (el) el.textContent = p;
+  })
+  .catch(() => {});
 
 /* ---------------- PWA ---------------- */
 

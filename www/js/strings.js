@@ -93,6 +93,26 @@ export const STRINGS = {
     "about.body":
       "Seasonist reads the color of your skin, eyes, and hair from one daylight photo and matches you to one of the 12 seasonal color palettes. The analysis runs entirely on your device — your photo is never uploaded. Results are a styling guide, not a medical or professional assessment.",
     "about.contact": "Contact & support: development@app-origin.com",
+
+    "unlock.eyebrow": "Full analysis",
+    "unlock.feat1": "Your complete colour palette",
+    "unlock.feat2": "See it on your photo — drape comparison",
+    "unlock.feat3": "Your undertone, depth & clarity",
+    "unlock.feat4": "Saved to your device — yours to keep",
+    "unlock.cap": "one-time · this analysis is yours to keep",
+    "unlock.cta": "Unlock full analysis",
+    "unlock.fine": "A one-time purchase for this analysis. No subscription, nothing recurring.",
+    "unlock.processing": "Contacting the App Store…",
+    "unlock.done": "Unlocked — saved to this device.",
+    "unlock.cancelled": "Purchase cancelled — nothing was charged.",
+    "unlock.failed": "The purchase didn't complete. Nothing was charged.",
+
+    "library.link": "Your analyses",
+    "library.eyebrow": "Your analyses",
+    "library.title": "Saved on this device",
+    "library.new": "New analysis",
+    "library.empty": "No saved analyses yet — unlock one to keep it here.",
+    "library.you": "You",
   },
 
   // Bulgarian translation (generated). Missing keys fall back to English.

@@ -109,15 +109,50 @@
         <h1 class="season-name" id="season-name">—</h1>
         <p class="body-text" id="season-desc"></p>
 
-        <div class="swatch-row" id="swatch-row"></div>
-        <div class="swatch-labels" id="swatch-labels"></div>
+        <!-- Free teaser: a few hero colours -->
+        <div class="hero-swatches" id="hero-swatches" hidden></div>
 
-        <div class="traits" id="traits"></div>
+        <!-- Premium — revealed after unlock -->
+        <div id="result-premium" hidden>
+          <div class="swatch-row" id="swatch-row"></div>
+          <div class="swatch-labels" id="swatch-labels"></div>
+          <div class="traits" id="traits"></div>
+        </div>
+
+        <!-- Unlock panel — shown while locked -->
+        <div class="unlock-panel" id="unlock-panel" hidden>
+          <span class="eyebrow" data-i18n="unlock.eyebrow">Full analysis</span>
+          <ul class="unlock-feat">
+            <li data-i18n="unlock.feat1">Your complete colour palette</li>
+            <li data-i18n="unlock.feat2">See it on your photo — drape comparison</li>
+            <li data-i18n="unlock.feat3">Your undertone, depth &amp; clarity</li>
+            <li data-i18n="unlock.feat4">Saved to your device — yours to keep</li>
+          </ul>
+          <div class="unlock-price veil-text" id="unlock-price">€4.99</div>
+          <div class="unlock-cap" data-i18n="unlock.cap">one-time · this analysis is yours to keep</div>
+          <button class="btn-primary" id="btn-unlock" data-i18n="unlock.cta">Unlock full analysis</button>
+          <p class="unlock-fine" data-i18n="unlock.fine">A one-time purchase for this analysis. No subscription, nothing recurring.</p>
+        </div>
 
         <div class="spacer"></div>
-        <button class="btn-primary" id="btn-to-compare" data-i18n="result.toCompare">See it on your photo</button>
+        <button class="btn-primary" id="btn-to-compare" data-i18n="result.toCompare" hidden>See it on your photo</button>
         <button class="btn-ghost" id="btn-retake" data-i18n="result.retake">Retake photo</button>
+        <button class="btn-ghost" id="btn-library" data-i18n="library.link" hidden>Your analyses</button>
         <button class="btn-ghost danger" id="btn-delete-result" data-i18n="result.delete">Delete my analysis</button>
+      </div>
+    </section>
+
+    <!-- ============ SCREEN: LIBRARY (saved analyses) ============ -->
+    <section class="screen" id="screen-library" aria-label="Your analyses">
+      <div class="content">
+        <button type="button" class="info-back" id="btn-library-back">
+          <span aria-hidden="true">←</span> <span data-i18n="legal.back">Back</span>
+        </button>
+        <span class="eyebrow" data-i18n="library.eyebrow">Your analyses</span>
+        <h1 class="title compact" data-i18n="library.title">Saved on this device</h1>
+        <div class="saved-list" id="saved-list"></div>
+        <div class="spacer"></div>
+        <button class="btn-ghost" id="btn-library-new" data-i18n="library.new">New analysis</button>
       </div>
     </section>
 
