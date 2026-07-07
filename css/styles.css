@@ -1,7 +1,7 @@
 /* ============================================================
-   Hue — design tokens
+   Seasonist — design tokens
    Palette: warm stone + ink, seasonal accents do the color work
-   Type: Fraunces (editorial serif) / Manrope (body) / JetBrains Mono (system)
+   Type: Cormorant Garamond (editorial serif) / Manrope (body) / JetBrains Mono (system)
    ============================================================ */
 
 :root{
@@ -16,7 +16,7 @@
   --sage: #6E8C82;
   --line: rgba(27,24,20,0.12);
 
-  --font-display: 'Fraunces', Georgia, serif;
+  --font-display: 'Cormorant Garamond', Georgia, serif;
   --font-body: 'Manrope', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 
@@ -160,7 +160,26 @@ body{
   box-shadow: 0 8px 24px rgba(27,24,20,0.08);
   color: var(--ink);
 }
-.badge svg{ width:26px; height:26px; }
+.badge svg{ width:30px; height:30px; }
+
+/* brand wordmark — wears the veil (deeper cut so thin strokes read as silk) */
+.brand-name{
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 28px;
+  line-height: 1;
+  margin: -8px 0 24px;
+  color: var(--ink-soft);
+}
+@supports ((-webkit-background-clip: text) or (background-clip: text)){
+  .brand-name{
+    background: linear-gradient(90deg, #D97F55 0%, #D3A052 38%, #8FA47C 66%, #7A93B5 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}
 
 .consent-list{
   list-style:none;

@@ -1,6 +1,6 @@
-# Hue — a quiet study in color
+# Seasonist — wear your season
 
-Personal color analysis from a single daylight photo. Fully client-side: the photo never leaves the user's device.
+Personal color analysis from a single daylight photo. Fully client-side: the photo never leaves the user's device. (Repo and live URL still carry the working name "hue".)
 
 ## User journey
 
@@ -45,7 +45,8 @@ js/compare.js       canvas renderer: photo + colored drape + ambient tint
 ## Design system
 
 - **Palette**: warm stone (`#ECE7E1`) + ink (`#1B1814`); seasonal swatches carry all the color
-- **Type**: Fraunces (italic serif, editorial moments) / Manrope (body) / JetBrains Mono (system labels)
+- **Type**: Cormorant Garamond (italic serif, brand voice + editorial moments) / Manrope (body) / JetBrains Mono (system labels)
+- **Brand**: the Season Drape mark — one silk S-stroke in the pastel "veil" gradient (peach `#E29B7B` → butter `#E5C185` → sage `#B9C6AC` → mist `#9DAEC4`); slogan “Wear your season.”
 - **Signature**: slow-morphing liquid blobs, ambient at low opacity, re-tinted with the user's own palette after analysis
 - Respects `prefers-reduced-motion`; keyboard focus visible throughout
 

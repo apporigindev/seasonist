@@ -9,10 +9,10 @@
  */
 
 const BUILD = "__BUILD__";
-const SHELL_CACHE = "hue-shell-" + BUILD;
+const SHELL_CACHE = "seasonist-shell-" + BUILD;
 // Stable across deploys: holds the immutable versioned CDN payloads (fonts,
 // MediaPipe runtime, ~3 MB face model) so shell releases don't re-download them.
-const RUNTIME_CACHE = "hue-runtime-v1";
+const RUNTIME_CACHE = "seasonist-runtime-v1";
 
 const APP_SHELL = [
   "./",
@@ -65,7 +65,12 @@ self.addEventListener("activate", (event) => {
     caches
       .keys()
       .then((keys) =>
-        Promise.all(keys.filter((k) => k.startsWith("hue-") && !keep.has(k)).map((k) => caches.delete(k)))
+        // "hue-" covers caches from before the app was renamed to Seasonist.
+        Promise.all(
+          keys
+            .filter((k) => (k.startsWith("seasonist-") || k.startsWith("hue-")) && !keep.has(k))
+            .map((k) => caches.delete(k))
+        )
       )
       .then(() => self.clients.claim())
   );

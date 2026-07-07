@@ -1,6 +1,6 @@
 # Privacy
 
-Hue analyzes your photo entirely on your device, in your browser.
+Seasonist analyzes your photo entirely on your device, in your browser.
 
 - **No upload.** Your photo is never sent to any server.
 - **No photo storage.** Your photo and results are never saved — they live only in memory and vanish when you close or refresh the page. There are no cookies, no analytics, no accounts. To work offline, the app does cache its own files (code, fonts, and the face-detection model) on your device; they contain no personal data, and clearing site data removes them.

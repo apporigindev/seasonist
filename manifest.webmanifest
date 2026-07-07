@@ -1,7 +1,7 @@
 {
-  "name": "Hue — Personal Color Analysis",
-  "short_name": "Hue",
-  "description": "A quiet study in color: personal color analysis from a single daylight photo, fully on-device.",
+  "name": "Seasonist — Personal Color Analysis",
+  "short_name": "Seasonist",
+  "description": "Wear your season: personal color analysis from a single daylight photo, fully on-device.",
   "start_url": ".",
   "scope": ".",
   "display": "standalone",
