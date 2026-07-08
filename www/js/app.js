@@ -109,10 +109,47 @@ $("file-input").addEventListener("change", (e) => {
     stopCamera();
     runAnalysis(img);
   };
+  img.onerror = () => {
+    // Corrupt/unreadable file — fail gracefully instead of hanging.
+    URL.revokeObjectURL(img.src);
+    state.errorKind = "generic";
+    applyError();
+    show("screen-error");
+  };
   img.src = URL.createObjectURL(file);
+  e.target.value = ""; // allow re-selecting the same file
 });
 
 /* ---------------- analysis ---------------- */
+
+// Deterministic-result cache. The same photo MUST always yield the same season
+// — a "sporadic" result would destroy user trust. We fingerprint the image
+// (a fixed 96×96 downscale, which is a pure function of its pixels) and cache
+// the classification, so re-analysing an identical image returns an identical
+// result regardless of any floating-point jitter in on-device face detection
+// or a face sitting near a classification boundary. In-memory only (per the
+// privacy model — nothing is persisted).
+const analysisCache = new Map();
+
+function imageFingerprint(img) {
+  const size = 96;
+  const c = document.createElement("canvas");
+  c.width = size;
+  c.height = size;
+  const ctx = c.getContext("2d", { willReadFrequently: true });
+  ctx.drawImage(img, 0, 0, size, size);
+  const d = ctx.getImageData(0, 0, size, size).data;
+  // Two independent FNV-style hashes → a 64-bit key (collisions negligible).
+  let h1 = 0x811c9dc5, h2 = 0xc2b2ae35 >>> 0;
+  for (let i = 0; i < d.length; i += 4) {
+    h1 = Math.imul(h1 ^ d[i], 0x01000193);
+    h1 = Math.imul(h1 ^ d[i + 1], 0x01000193);
+    h1 = Math.imul(h1 ^ d[i + 2], 0x01000193);
+    h2 = Math.imul(h2 ^ d[i], 0x85ebca6b);
+    h2 = Math.imul(h2 ^ d[i + 1], 0x85ebca6b);
+  }
+  return (h1 >>> 0).toString(16).padStart(8, "0") + (h2 >>> 0).toString(16).padStart(8, "0");
+}
 
 async function runAnalysis(img) {
   state.photo = img;
@@ -126,11 +163,18 @@ async function runAnalysis(img) {
   }, 900);
 
   try {
-    const samples = await analyzeImage(img, $("work-canvas"));
-    const { key, metrics } = classify(samples);
-    state.faceBox = samples.faceBox;
-    state.seasonKey = key;
-    state.metrics = metrics;
+    // Same image → same result, always (see analysisCache above).
+    const fingerprint = imageFingerprint(img);
+    let out = analysisCache.get(fingerprint);
+    if (!out) {
+      const samples = await analyzeImage(img, $("work-canvas"));
+      const { key, metrics } = classify(samples);
+      out = { key, metrics, faceBox: samples.faceBox };
+      analysisCache.set(fingerprint, out);
+    }
+    state.faceBox = out.faceBox;
+    state.seasonKey = out.key;
+    state.metrics = out.metrics;
     state.unlocked = false; // every new analysis starts locked
     clearInterval(ticker);
     renderResult();
