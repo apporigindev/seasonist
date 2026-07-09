@@ -82,14 +82,14 @@
 
         <div class="capture-frame">
           <div class="face-ring" id="face-ring">
-            <video id="camera-feed" autoplay playsinline muted></video>
+            <video id="camera-feed" autoplay playsinline muted aria-hidden="true"></video>
             <span id="ring-hint" data-i18n="capture.ringHint">align face</span>
           </div>
           <div class="tip-pill" data-i18n="capture.tip">Natural light · No flash · Look straight ahead</div>
         </div>
 
         <button class="btn-primary" id="btn-capture" data-i18n="capture.take">Take photo</button>
-        <label class="btn-ghost" for="file-input" data-i18n="capture.upload">Upload from gallery instead</label>
+        <label class="btn-ghost" for="file-input" role="button" tabindex="0" data-i18n="capture.upload">Upload from gallery instead</label>
         <input type="file" id="file-input" accept="image/*" hidden>
       </div>
     </section>
@@ -98,7 +98,7 @@
     <section class="screen" id="screen-analyzing" aria-label="Analyzing">
       <div class="content center">
         <div class="analyzing-orb" aria-hidden="true"></div>
-        <span class="eyebrow" id="analyzing-status" data-i18n="analyzing.step1">Reading your coloring…</span>
+        <span class="eyebrow" id="analyzing-status" role="status" aria-live="polite" data-i18n="analyzing.step1">Reading your coloring…</span>
       </div>
     </section>
 

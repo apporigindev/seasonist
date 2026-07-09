@@ -41,7 +41,24 @@ let unlockPrice = "€4.99"; // localized store price, resolved on init
 
 function show(screenId) {
   document.querySelectorAll(".screen").forEach((s) => s.classList.remove("active"));
-  $(screenId).classList.add("active");
+  const el = $(screenId);
+  el.classList.add("active");
+  moveFocusTo(el);
+}
+
+// Move focus into the newly shown screen so screen-reader + keyboard users
+// follow the change (otherwise focus is stranded on the now-hidden screen).
+function moveFocusTo(screenEl) {
+  const target = screenEl.querySelector("h1, .title") || screenEl;
+  if (!target) return;
+  if (!target.hasAttribute("tabindex")) target.setAttribute("tabindex", "-1");
+  requestAnimationFrame(() => {
+    try {
+      target.focus({ preventScroll: true });
+    } catch {
+      /* focus is best-effort */
+    }
+  });
 }
 
 function activeScreenId() {
@@ -124,6 +141,20 @@ $("file-input").addEventListener("change", (e) => {
   img.src = URL.createObjectURL(file);
   e.target.value = ""; // allow re-selecting the same file
 });
+
+// The "Upload from gallery" control is a <label> for the hidden file input.
+// A label isn't keyboard-operable by default, so open the picker on Enter/Space.
+{
+  const uploadLabel = document.querySelector('label[for="file-input"]');
+  if (uploadLabel) {
+    uploadLabel.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") {
+        e.preventDefault();
+        $("file-input").click();
+      }
+    });
+  }
+}
 
 /* ---------------- analysis ---------------- */
 
