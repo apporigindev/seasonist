@@ -7,11 +7,12 @@
  * the feature is completely hidden and no network call is ever made.
  */
 
-// Origin of the try-on backend, e.g. "https://seasonist-api.up.railway.app".
-// Leave empty to disable the feature entirely.
-export const TRYON_API_BASE = "";
+// Origin of the try-on backend. Leave empty to disable the feature entirely.
+export const TRYON_API_BASE = "https://seasonist-api-production.up.railway.app";
 
-// Optional shared secret (x-api-key) if the backend sets APP_API_KEY.
+// Shared secret (x-api-key) matching the backend's APP_API_KEY. Left empty in
+// the repo (public); the iOS CI stamps the real value into the app bundle at
+// build time (see .github/workflows/ios-testflight.yml).
 export const APP_API_KEY = "";
 
 /** A stable, anonymous, on-device id used to correlate purchases (no PII). */

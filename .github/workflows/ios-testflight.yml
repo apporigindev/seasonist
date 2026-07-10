@@ -41,6 +41,19 @@ jobs:
           sed -i.bak "s/__BUILD__/$STAMP/" www/sw.js && rm -f www/sw.js.bak
           grep "const BUILD" www/sw.js
 
+      # The x-api-key for the try-on backend is never committed (public repo);
+      # stamp it into the app bundle here. Empty secret → feature stays off.
+      - name: Stamp try-on API key
+        env:
+          SEASONIST_APP_API_KEY: ${{ secrets.SEASONIST_APP_API_KEY }}
+        run: |
+          if [ -n "$SEASONIST_APP_API_KEY" ]; then
+            sed -i.bak "s/export const APP_API_KEY = \"\";/export const APP_API_KEY = \"$SEASONIST_APP_API_KEY\";/" www/js/config.js && rm -f www/js/config.js.bak
+            grep -q "$SEASONIST_APP_API_KEY" www/js/config.js && echo "API key stamped."
+          else
+            echo "::warning::SEASONIST_APP_API_KEY not set — try-on requests will be rejected by the backend."
+          fi
+
       - name: Sync web app into the iOS project
         run: npx cap sync ios
 
