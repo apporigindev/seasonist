@@ -14,7 +14,15 @@ import { renderCompare } from "./compare.js";
 import { LEGAL } from "./legalContent.js";
 import { t, getLang, initI18n, applyStatic, onLangChange } from "./i18n.js";
 import { initPurchases, getUnlockPrice, buyUnlock, getTryonPrice, buyTryon } from "./purchase.js";
-import { listAnalyses, saveAnalysis, getAnalysis, newId } from "./savedAnalyses.js";
+import {
+  listAnalyses,
+  saveAnalysis,
+  getAnalysis,
+  newId,
+  startUnlockGrace,
+  unlockGraceActive,
+  consumeUnlockRerun,
+} from "./savedAnalyses.js";
 import { tryonAvailable as checkTryonAvailable, generateTryon } from "./tryonApi.js";
 
 const $ = (id) => document.getElementById(id);
@@ -34,6 +42,7 @@ const state = {
   tryonAvailable: false, // is the paid "See it for real" tier live (backend up)?
   tryonImages: null, // generated try-on results for the current session
   tryonProof: null,  // { transactionId?, signedTransaction? } from the pack purchase
+  deltaFrom: null,   // a previous season this re-run differs from (for the delta note)
 };
 
 let unlockPrice = "€4.99"; // localized store price, resolved on init
@@ -218,9 +227,26 @@ async function runAnalysis(img) {
     state.faceBox = out.faceBox;
     state.seasonKey = out.key;
     state.metrics = out.metrics;
-    // A new analysis starts locked — unless the user already paid for a try-on
-    // pack (proof held) and is just retaking for a better AI-photo framing.
-    state.unlocked = !!state.tryonProof;
+    // A new analysis is normally locked — but a recent purchase grants free
+    // re-runs (refine your OWN photo), and a held try-on pack keeps it unlocked.
+    const graced = unlockGraceActive();
+    state.unlocked = graced || !!state.tryonProof;
+    state.deltaFrom = null;
+    if (graced) {
+      const prev = listAnalyses()[0]; // most recent BEFORE we save this one
+      consumeUnlockRerun();
+      saveAnalysis({
+        id: newId(),
+        seasonKey: state.seasonKey,
+        metrics: state.metrics,
+        label: t("library.you"),
+        unlockedAt: new Date().toISOString(),
+      });
+      // A different season from last time? Surface it honestly (both are kept).
+      if (prev && prev.seasonKey && prev.seasonKey !== state.seasonKey) {
+        state.deltaFrom = prev.seasonKey;
+      }
+    }
     clearInterval(ticker);
     renderResult();
     show("screen-result");
@@ -280,7 +306,23 @@ function renderResult() {
   document.querySelector(".blob.b1").style.background =
     `conic-gradient(from 120deg, ${c1}, ${c2} 30%, ${c3} 60%, ${c4} 85%, ${c1})`;
 
+  renderResultNotes();
   applyUnlockState();
+}
+
+/** The "this photo reads differently from last time" banner (both are kept). */
+function renderResultNotes() {
+  const delta = $("result-delta");
+  if (state.deltaFrom) {
+    const cur = localizeSeason(state.seasonKey, getLang());
+    const old = localizeSeason(state.deltaFrom, getLang());
+    delta.textContent = t("result.delta")
+      .replace("{new}", cur ? cur.name : "")
+      .replace("{old}", old ? old.name : "");
+    delta.hidden = false;
+  } else {
+    delta.hidden = true;
+  }
 }
 
 /** A metallic CSS gradient for a metal name (matches by keyword, any language). */
@@ -380,6 +422,7 @@ async function doUnlock() {
         label: t("library.you"),
         unlockedAt: new Date().toISOString(),
       });
+      startUnlockGrace(); // free re-runs to refine your photo for a short window
       applyUnlockState();
       showToast(t("unlock.done"));
     } else if (res && res.cancelled) {
@@ -418,6 +461,7 @@ async function doUnlockPremium() {
         label: t("library.you"),
         unlockedAt: new Date().toISOString(),
       });
+      startUnlockGrace(); // free re-runs to refine your photo for a short window
       applyUnlockState();
       showToast(t("unlock.premium.done"));
     } else if (res && res.cancelled) {
@@ -816,12 +860,17 @@ function tryonErrorText(err) {
 $("btn-tryon-retry").addEventListener("click", runTryon);
 $("btn-tryon-back").addEventListener("click", () => show("screen-result"));
 
-/** Clear any generated try-on results from memory + the screen. */
-function clearTryon() {
+/** Clear stale generated images (a retake needs fresh ones) but KEEP the paid pack. */
+function clearTryonImages() {
   state.tryonImages = null;
-  state.tryonProof = null;
   const g = $("tryon-gallery");
   if (g) g.replaceChildren();
+}
+
+/** Full clear including the paid pack — for start-over / delete only. */
+function clearTryon() {
+  clearTryonImages();
+  state.tryonProof = null;
 }
 
 /* ---------------- info: privacy / terms / about ---------------- */
@@ -873,7 +922,9 @@ function resetToCapture() {
   state.photo = null;
   state.faceBox = null;
   state.unlocked = false;
-  clearTryon();
+  // A retake refines the same session — keep the paid try-on pack (if any); the
+  // grace window lets the new analysis unlock without paying again.
+  clearTryonImages();
   show("screen-capture");
   startCamera();
 }

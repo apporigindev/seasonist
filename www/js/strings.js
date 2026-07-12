@@ -53,6 +53,8 @@ export const STRINGS = {
     "result.section.avoid": "Colours to avoid",
     "result.section.makeup": "Makeup",
     "result.section.styling": "How to wear your season",
+    "result.photoNote": "Your result reflects this photo's light. For your truest season use even daylight — you can re-run free within your unlock.",
+    "result.delta": "This photo reads as {new} — a little different from your earlier {old}. Photos and light shift the read; keep whichever feels most like you. Both are saved.",
     "result.lead.palette": "The colours that light you up — wear them close to your face.",
     "result.lead.neutrals": "Your everyday basics — reach for these instead of black and stark white.",
     "result.lead.avoid": "These fight your colouring — they tend to dull or grey the skin.",
