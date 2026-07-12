@@ -218,14 +218,19 @@ async function runAnalysis(img) {
     state.faceBox = out.faceBox;
     state.seasonKey = out.key;
     state.metrics = out.metrics;
-    state.unlocked = false; // every new analysis starts locked
+    // A new analysis starts locked — unless the user already paid for a try-on
+    // pack (proof held) and is just retaking for a better AI-photo framing.
+    state.unlocked = !!state.tryonProof;
     clearInterval(ticker);
     renderResult();
     show("screen-result");
   } catch (err) {
     clearInterval(ticker);
     state.errorKind =
-      err.message === "no-face" ? "noFace" : err.message === "low-light" ? "lowLight" : "generic";
+      err.message === "no-face" ? "noFace"
+      : err.message === "low-light" ? "lowLight"
+      : err.message === "blurry" ? "blurry"
+      : "generic";
     applyError();
     show("screen-error");
   }
@@ -589,6 +594,20 @@ function photoDataUri(maxDim = 1024) {
   return c.toDataURL("image/jpeg", 0.9);
 }
 
+// The AI recolors a garment (top or scarf), so it needs some of the neck /
+// shoulders below the chin. A tight face-only close-up leaves nothing to dress.
+function tryonFramingOk() {
+  const fb = state.faceBox;
+  if (!fb) return true;
+  const belowChin = 1 - (fb.y + fb.h); // fraction of the image below the face
+  return belowChin >= 0.14 && fb.h <= 0.66;
+}
+
+function openTryonConsent() {
+  $("tryon-consent-overlay").hidden = false;
+  $("tryon-consent-agree").focus();
+}
+
 $("btn-tryon").addEventListener("click", () => {
   if (!(state.unlocked && state.photo && state.tryonAvailable)) return;
   // Already generated → straight back to the gallery.
@@ -598,8 +617,34 @@ $("btn-tryon").addEventListener("click", () => {
     show("screen-tryon");
     return;
   }
-  $("tryon-consent-overlay").hidden = false;
-  $("tryon-consent-agree").focus();
+  // Too tight a close-up → explain and offer a reframe before we generate.
+  if (!tryonFramingOk()) {
+    $("tryon-frame-overlay").hidden = false;
+    $("tryon-frame-retake").focus();
+    return;
+  }
+  openTryonConsent();
+});
+
+/* ----- framing guidance (needs the neck/shoulders for a garment) ----- */
+function closeTryonFrame() {
+  $("tryon-frame-overlay").hidden = true;
+}
+$("tryon-frame-anyway").addEventListener("click", () => {
+  closeTryonFrame();
+  openTryonConsent();
+});
+$("tryon-frame-retake").addEventListener("click", () => {
+  closeTryonFrame();
+  // Keep the paid pack (tryonProof) — just get a better-framed photo.
+  state.photo = null;
+  state.faceBox = null;
+  state.tryonImages = null;
+  show("screen-capture");
+  startCamera();
+});
+$("tryon-frame-overlay").addEventListener("click", (e) => {
+  if (e.target === $("tryon-frame-overlay")) closeTryonFrame();
 });
 
 function closeTryonConsent() {

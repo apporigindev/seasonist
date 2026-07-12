@@ -82,10 +82,12 @@ function buildPrompt(color: TargetColor): string {
   // Describe the target color from its regex-validated hex ONLY. The client-
   // supplied color.name is display-only and must never enter the model prompt
   // (it is free-form text and would be a prompt-injection vector).
+  const c = `${describeHex(color.hex)} (hex ${color.hex})`;
   return (
-    `Change only the color of the person's top to ${describeHex(color.hex)} (hex ${color.hex}). ` +
-    `Keep the face, skin tone, hair, expression, pose, hands, framing, lighting and ` +
-    `background exactly the same. Photorealistic, natural fabric.`
+    `Recolor the clothing the person is wearing to ${c}. If little or no clothing is ` +
+    `visible because it is a close-up of the face, add an elegant ${c} scarf draped ` +
+    `around the neck and shoulders in that exact colour. Keep the face, skin tone, hair, ` +
+    `expression and pose exactly the same. Photorealistic, natural fabric, soft even lighting.`
   );
 }
 

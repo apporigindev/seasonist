@@ -147,6 +147,16 @@ body{
   line-height: 1.25;
   margin-bottom: 14px;
 }
+/* "See it for real" — the display serif, matching the "You, in your colours"
+   title it sits above (not the mono eyebrow used elsewhere). */
+.eyebrow-serif{
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 16px;
+  text-transform: none;
+  letter-spacing: 0.01em;
+}
 .title.compact{ font-size: 22px; margin-bottom: 18px; }
 .title em{ font-style: italic; color: var(--mauve-deep); }
 

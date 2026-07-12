@@ -30,7 +30,7 @@ export const STRINGS = {
       "Face a window, skip filters and makeup if you can, and keep a neutral expression.",
     "capture.ringHint": "align face",
     "capture.cameraUnavailable": "camera unavailable — upload below",
-    "capture.tip": "Natural light · No flash · Look straight ahead",
+    "capture.tip": "Natural light · Include your shoulders · No flash",
     "capture.take": "Take photo",
     "capture.upload": "Upload from gallery instead",
 
@@ -90,6 +90,10 @@ export const STRINGS = {
     "tryon.generating": "Creating your looks…",
     "tryon.retry": "Try again",
     "tryon.back": "Back to summary",
+    "tryon.frame.title": "A little more of you, please",
+    "tryon.frame.body": "This is a close-up of your face. To dress you in colour — a top or a scarf — the AI needs to see your neck and shoulders. Retake with a bit more of you in frame for the best result. Your unlock is kept.",
+    "tryon.frame.anyway": "Try anyway",
+    "tryon.frame.retake": "Retake photo",
     "tryon.save": "Save",
     "tryon.consent.title": "Send your photo to create these images?",
     "tryon.consent.body": "To make photos of you in each colour, your selfie is sent securely to our image partner (fal.ai) and deleted right after. This is the only feature that sends your photo off your device — everything else stays on it. It's optional, and your photo is never used to train models.",
@@ -113,6 +117,9 @@ export const STRINGS = {
     "error.lowLight.title": "The photo is too dark",
     "error.lowLight.text":
       "Move closer to a window or brighter daylight and try again — good light is everything here.",
+    "error.blurry.title": "That photo looks blurry",
+    "error.blurry.text":
+      "Hold steady and take it again — a sharp, in-focus photo gives a far more accurate result.",
     "error.generic.title": "Something went wrong",
     "error.generic.text":
       "The analysis couldn't finish. Check your connection (the face model loads once from the web) and try again.",

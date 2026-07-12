@@ -125,7 +125,7 @@ export async function analyzeImage(imageSource, workCanvas) {
   const skinLuma = 0.2126 * skin.r + 0.7152 * skin.g + 0.0722 * skin.b;
   if (skinLuma < 30) throw new Error("low-light");
 
-  // Face bounding box (normalized) — used by the compare renderer.
+  // Face bounding box (normalized) — used by the compare renderer + framing.
   const xs = points.map((p) => p.x);
   const ys = points.map((p) => p.y);
   const faceBox = {
@@ -135,7 +135,47 @@ export async function analyzeImage(imageSource, workCanvas) {
     h: Math.max(...ys) - Math.min(...ys),
   };
 
+  // Reject clearly out-of-focus photos. Measured on the FACE region only (a
+  // soft/bokeh background must not count), on a resolution-normalised crop, and
+  // with a deliberately low threshold so only genuinely blurry photos are
+  // rejected — a false reject is worse UX than letting a slightly-soft one pass.
+  if (faceSharpness(ctx, faceBox, w, h) < BLUR_MIN) throw new Error("blurry");
+
   return { skin, eyes, hair, faceBox };
+}
+
+// Laplacian variance over a resolution-normalised crop of the face region.
+// Higher = sharper. Returns Infinity when the region is too small to judge.
+const BLUR_MIN = 9;
+function faceSharpness(ctx, faceBox, w, h) {
+  const fx = Math.max(0, Math.round(faceBox.x * w));
+  const fy = Math.max(0, Math.round(faceBox.y * h));
+  const fw = Math.min(w - fx, Math.round(faceBox.w * w));
+  const fh = Math.min(h - fy, Math.round(faceBox.h * h));
+  if (fw < 16 || fh < 16) return Infinity;
+  const SW = 200;
+  const sh = Math.max(16, Math.round((fh / fw) * SW));
+  const c = document.createElement("canvas");
+  c.width = SW;
+  c.height = sh;
+  const cx = c.getContext("2d", { willReadFrequently: true });
+  cx.drawImage(ctx.canvas, fx, fy, fw, fh, 0, 0, SW, sh);
+  const d = cx.getImageData(0, 0, SW, sh).data;
+  const gray = new Float32Array(SW * sh);
+  for (let i = 0; i < SW * sh; i++) gray[i] = 0.299 * d[i * 4] + 0.587 * d[i * 4 + 1] + 0.114 * d[i * 4 + 2];
+  let sum = 0, sum2 = 0, n = 0;
+  for (let y = 1; y < sh - 1; y++) {
+    for (let x = 1; x < SW - 1; x++) {
+      const k = y * SW + x;
+      const lap = 4 * gray[k] - gray[k - 1] - gray[k + 1] - gray[k - SW] - gray[k + SW];
+      sum += lap;
+      sum2 += lap * lap;
+      n++;
+    }
+  }
+  if (n === 0) return Infinity;
+  const mean = sum / n;
+  return sum2 / n - mean * mean;
 }
 
 /* ---------------- pixel sampling helpers ---------------- */

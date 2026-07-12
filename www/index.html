@@ -145,7 +145,7 @@
 
           <!-- See it for real — shown only when the backend tier is live + a photo exists -->
           <div class="tryon-card" id="tryon-card" hidden>
-            <span class="eyebrow" data-i18n="tryon.eyebrow">See it for real</span>
+            <span class="eyebrow eyebrow-serif" data-i18n="tryon.eyebrow">See it for real</span>
             <p class="tryon-lead" data-i18n="tryon.lead">Photorealistic — you, wearing your best colours.</p>
             <div class="tryon-price veil-text" id="tryon-price">€8.99</div>
             <button class="btn-primary" id="btn-tryon" data-i18n="tryon.cta">See it for real</button>
@@ -252,7 +252,7 @@
     <!-- ============ SCREEN: TRY-ON (See it for real) ============ -->
     <section class="screen" id="screen-tryon" aria-label="See it for real">
       <div class="content">
-        <span class="eyebrow" data-i18n="tryon.eyebrow">See it for real</span>
+        <span class="eyebrow eyebrow-serif" data-i18n="tryon.eyebrow">See it for real</span>
         <h1 class="title compact" data-i18n-html="tryon.title">You, in <em>your colours</em></h1>
 
         <span class="eyebrow tryon-status" id="tryon-status" role="status" aria-live="polite" data-i18n="tryon.generating" hidden>Creating your looks…</span>
@@ -300,6 +300,18 @@
       <p class="confirm-text" id="confirm-text" data-i18n="confirm.text">Your photo and result live only on this device — they were never uploaded or stored anywhere. This clears them from here now.</p>
       <button class="btn-primary" id="confirm-delete" data-i18n="confirm.delete">Delete</button>
       <button class="btn-ghost" id="confirm-cancel" data-i18n="confirm.cancel">Keep it</button>
+    </div>
+  </div>
+
+  <!-- ============ Try-on framing guidance (needs neck/shoulders) ============ -->
+  <div class="confirm-overlay" id="tryon-frame-overlay" hidden>
+    <div class="confirm-card" role="dialog" aria-modal="true" aria-labelledby="tryon-frame-title" aria-describedby="tryon-frame-text">
+      <h2 class="confirm-title" id="tryon-frame-title" data-i18n="tryon.frame.title">A little more of you, please</h2>
+      <p class="confirm-text" id="tryon-frame-text" data-i18n="tryon.frame.body">This is a close-up of your face. To dress you in colour — a top or a scarf — the AI needs to see your neck and shoulders. Retake with a bit more of you in frame for the best result. Your unlock is kept.</p>
+      <div class="tryon-consent-actions">
+        <button class="btn-outline" id="tryon-frame-anyway" data-i18n="tryon.frame.anyway">Try anyway</button>
+        <button class="btn-primary" id="tryon-frame-retake" data-i18n="tryon.frame.retake">Retake photo</button>
+      </div>
     </div>
   </div>
 
