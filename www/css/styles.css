@@ -178,9 +178,8 @@ body{
 
 /* ---------- consent ---------- */
 
-/* Welcome intro: logo + wordmark + headline, centred as a unit. */
-.consent-intro{ text-align: center; }
-.consent-intro .badge{ margin-left: auto; margin-right: auto; }
+/* Welcome intro: logo + wordmark + headline, left-aligned. */
+.consent-intro{ text-align: left; }
 /* On the welcome screen the eyebrow wears the brand body font (not the mono
    label used elsewhere), so it sits with the wordmark and headline. */
 #screen-consent .eyebrow{
@@ -190,25 +189,25 @@ body{
 }
 
 .badge{
-  width: 64px; height: 64px;
+  width: 88px; height: 88px;
   border-radius: 50%;
   background: rgba(251,249,246,0.7);
   backdrop-filter: blur(8px);
   display:flex; align-items:center; justify-content:center;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
   box-shadow: 0 8px 24px rgba(27,24,20,0.08);
   color: var(--ink);
 }
-.badge svg{ width:30px; height:30px; }
+.badge svg{ width:44px; height:44px; }
 
 /* brand wordmark — wears the veil (deeper cut so thin strokes read as silk) */
 .brand-name{
   font-family: var(--font-display);
   font-style: italic;
   font-weight: 500;
-  font-size: 28px;
+  font-size: 38px;
   line-height: 1;
-  margin: -8px 0 24px;
+  margin: 0 0 24px;
   color: var(--ink-soft);
 }
 @supports ((-webkit-background-clip: text) or (background-clip: text)){
